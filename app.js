@@ -310,8 +310,7 @@ function resultShareText(result) {
 qrtButton.addEventListener("click", () => {
   if (!currentResult) return;
   if (!ORIGINAL_POST_URL) return;
-  const text = `${resultShareText(currentResult)}\n\n${ORIGINAL_POST_URL}`;
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+  window.open(ORIGINAL_POST_URL, "_blank", "noopener,noreferrer");
 });
 
 shareButton.addEventListener("click", () => {
