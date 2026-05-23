@@ -144,8 +144,8 @@ function normalizeTweet(tweet, handle) {
   };
 }
 
-function rankLabel(count) {
-  if (count > 20) return "mega sexy";
+function rankLabel(count, viewCount = 0) {
+  if (count > 20 && viewCount > 10000) return "mega sexy";
   if (count > 15) return "megapilled";
   if (count > 10) return "kindamega";
   if (count >= 5) return "notmega";
@@ -245,6 +245,7 @@ module.exports = async function handler(request, response) {
       },
       { likeCount: 0, repostCount: 0, replyCount: 0, quoteCount: 0, viewCount: 0, visibleEngagement: 0 }
     );
+    const label = rankLabel(tweets.length, totals.viewCount);
 
     send(response, 200, {
       scannedAt: new Date().toISOString(),
@@ -261,7 +262,7 @@ module.exports = async function handler(request, response) {
         followers: toNumber(user.followers || user.followersCount || user.follower_count),
       },
       mentionCount: tweets.length,
-      label: rankLabel(tweets.length),
+      label,
       totals,
       firstMention: oldest,
       latestMention: latest,
