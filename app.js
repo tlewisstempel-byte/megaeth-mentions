@@ -279,15 +279,35 @@ shareButton.addEventListener("click", () => {
 
 downloadButton.addEventListener("click", () => {
   if (!currentResult) return;
-  const blob = new Blob([cardSvg(currentResult)], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `megaeth-mentions-${currentResult.handle}.svg`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  const svgBlob = new Blob([cardSvg(currentResult)], { type: "image/svg+xml;charset=utf-8" });
+  const svgUrl = URL.createObjectURL(svgBlob);
+  const image = new Image();
+  image.decoding = "async";
+  image.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 630;
+    const context = canvas.getContext("2d");
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(svgUrl);
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const pngUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = pngUrl;
+      link.download = `megaeth-mentions-${currentResult.handle}.png`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(pngUrl);
+    }, "image/png");
+  };
+  image.onerror = () => {
+    URL.revokeObjectURL(svgUrl);
+    setStatus("Could not download the image. Try again.", "error");
+  };
+  image.src = svgUrl;
 });
 
 function boot() {
