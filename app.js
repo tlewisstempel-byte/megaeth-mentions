@@ -9,14 +9,16 @@ const resultEyebrow = document.querySelector("#resultEyebrow");
 const resultTitle = document.querySelector("#resultTitle");
 const resultCopy = document.querySelector("#resultCopy");
 const resultControls = document.querySelector("#resultControls");
+const qrtButton = document.querySelector("#qrtButton");
 const shareButton = document.querySelector("#shareButton");
 const downloadButton = document.querySelector("#downloadButton");
-const copyButton = document.querySelector("#copyButton");
 const topPost = document.querySelector("#topPost");
 const topPostText = document.querySelector("#topPostText");
 const topPostStats = document.querySelector("#topPostStats");
 
 const STORAGE_KEY = "megaeth-mentions:last-result";
+const SITE_URL = "https://megaeth-mentions.vercel.app";
+const ORIGINAL_POST_URL = "";
 let currentResult = null;
 
 function showLandingView() {
@@ -188,9 +190,10 @@ function applyResult(result) {
       ? `@${result.handle} has been posting in real time.`
       : `@${result.handle} has not mentioned MegaETH in the last 12 months.`;
   resultControls.hidden = false;
+  qrtButton.disabled = !ORIGINAL_POST_URL;
+  qrtButton.title = ORIGINAL_POST_URL ? "" : "Add the launch tweet URL in app.js after posting.";
   shareButton.disabled = false;
   downloadButton.disabled = false;
-  copyButton.disabled = false;
 }
 
 async function scan(handle) {
@@ -246,14 +249,28 @@ form.addEventListener("submit", (event) => {
   scan(handle);
 });
 
+function resultShareText(result) {
+  if (result.mentionCount > 0) {
+    return `I mentioned MegaETH ${result.mentionCount} times in the last 12 months.\n\n${result.label}.\n\nCheck yours: ${SITE_URL}`;
+  }
+
+  return `Apparently I have mentioned MegaETH 0 times in the last 12 months.\n\n${result.label}.\n\nCheck yours: ${SITE_URL}`;
+}
+
+qrtButton.addEventListener("click", () => {
+  if (!currentResult) return;
+  if (!ORIGINAL_POST_URL) return;
+  const text = `${resultShareText(currentResult)}\n\n${ORIGINAL_POST_URL}`;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+});
+
 shareButton.addEventListener("click", () => {
   if (!currentResult) return;
-  const url = "https://megaeth-mentions.vercel.app";
-  const text =
-    currentResult.mentionCount > 0
-      ? `I mentioned MegaETH ${currentResult.mentionCount} times in the last 12 months.\n\nReal-time posting, apparently.\n\nCheck yours: ${url}`
-      : `Apparently I have mentioned MegaETH 0 times in the last 12 months.\n\nFixing that.\n\nCheck yours: ${url}`;
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+  window.open(
+    `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultShareText(currentResult))}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
 });
 
 downloadButton.addEventListener("click", () => {
@@ -267,13 +284,6 @@ downloadButton.addEventListener("click", () => {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-});
-
-copyButton.addEventListener("click", async () => {
-  if (!currentResult) return;
-  const url = `${window.location.origin}/result/${currentResult.handle}`;
-  await navigator.clipboard.writeText(url);
-  setStatus("Result link copied.");
 });
 
 function boot() {

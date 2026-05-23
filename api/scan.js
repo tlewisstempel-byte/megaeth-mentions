@@ -133,13 +133,11 @@ function normalizeTweet(tweet, handle) {
 }
 
 function rankLabel(count) {
-  if (count === 0) return "Still early";
-  if (count < 3) return "Touched grass";
-  if (count < 10) return "Casual believer";
-  if (count < 25) return "Real-time reply guy";
-  if (count < 75) return "Mega pilled";
-  if (count < 150) return "Sequencer energy";
-  return "Unhinged in public";
+  if (count > 20) return "mega sexy";
+  if (count > 15) return "megapilled";
+  if (count > 10) return "kindamega";
+  if (count >= 5) return "notmega";
+  return "probably a monad fan";
 }
 
 module.exports = async function handler(request, response) {
