@@ -20,4 +20,4 @@ TWITTER_API_TOKEN=
 
 Import this folder into Vercel, add `TWITTER_API_TOKEN`, and deploy.
 
-The Vercel project is connected to GitHub, so pushes to `main` deploy production.
+The Vercel project is connected to GitHub. Pushes to `main` should deploy production once the GitHub integration is active for the repo.
