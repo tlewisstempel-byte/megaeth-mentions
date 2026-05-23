@@ -17,7 +17,7 @@ const topPostText = document.querySelector("#topPostText");
 const topPostStats = document.querySelector("#topPostStats");
 
 const STORAGE_KEY = "megaeth-mentions:last-result";
-const SITE_URL = "https://megaeth-mentions.vercel.app";
+const SITE_URL = "https://megamentions.xyz";
 const ORIGINAL_POST_URL = "";
 let currentResult = null;
 
