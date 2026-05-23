@@ -81,10 +81,13 @@ function metricValue(result) {
   return result?.totals?.viewCount > 0 ? result.totals.viewCount : result?.totals?.visibleEngagement || 0;
 }
 
-function cardSvg(result, avatarOverride = "") {
+function cardSvg(result, avatarOverride) {
   const safeName = escapeHtml(result.profile?.name || result.handle);
   const safeHandle = escapeHtml(result.handle);
-  const avatar = escapeHtml(avatarOverride || avatarUrl(result));
+  const avatar = avatarOverride === null ? "" : escapeHtml(avatarOverride || avatarUrl(result));
+  const avatarImage = avatar
+    ? `<image href="${avatar}" x="94" y="94" width="140" height="140" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)"/>`
+    : "";
   const main = compactNumber(result.mentionCount);
   const secondary = compactNumber(metricValue(result));
   const label = escapeHtml(result.label || "MegaETH poster");
@@ -114,7 +117,7 @@ function cardSvg(result, avatarOverride = "") {
   <text x="72" y="72" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="22" font-weight="700" letter-spacing="4">MEGAETH MENTIONS</text>
 
   <circle cx="164" cy="164" r="74" fill="none" stroke="#b7ff2a" stroke-width="3"/>
-  <image href="${avatar}" x="94" y="94" width="140" height="140" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)"/>
+  ${avatarImage}
   <text x="270" y="145" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="900">${safeName}</text>
   <text x="270" y="190" fill="rgba(244,245,238,.62)" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">@${safeHandle}</text>
 
@@ -157,6 +160,34 @@ async function avatarDataUrl(result) {
   } catch {
     return "";
   }
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+function drawAvatar(context, image) {
+  const size = 140;
+  const x = 94;
+  const y = 94;
+  const scale = Math.max(size / image.naturalWidth, size / image.naturalHeight);
+  const width = image.naturalWidth * scale;
+  const height = image.naturalHeight * scale;
+  const dx = x + (size - width) / 2;
+  const dy = y + (size - height) / 2;
+
+  context.save();
+  context.beginPath();
+  context.arc(164, 164, 70, 0, Math.PI * 2);
+  context.clip();
+  context.drawImage(image, dx, dy, width, height);
+  context.restore();
 }
 
 function renderLoadingCard(handle) {
@@ -296,17 +327,24 @@ downloadButton.addEventListener("click", async () => {
   if (!currentResult) return;
   downloadButton.disabled = true;
   const inlineAvatar = await avatarDataUrl(currentResult);
-  const svgBlob = new Blob([cardSvg(currentResult, inlineAvatar)], { type: "image/svg+xml;charset=utf-8" });
+  const svgBlob = new Blob([cardSvg(currentResult, null)], { type: "image/svg+xml;charset=utf-8" });
   const svgUrl = URL.createObjectURL(svgBlob);
   const image = new Image();
   image.decoding = "async";
-  image.onload = () => {
+  image.onload = async () => {
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
     canvas.height = 630;
     const context = canvas.getContext("2d");
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     URL.revokeObjectURL(svgUrl);
+    if (inlineAvatar) {
+      try {
+        drawAvatar(context, await loadImage(inlineAvatar));
+      } catch {
+        setStatus("Downloaded card without avatar. Try again if needed.", "error");
+      }
+    }
 
     canvas.toBlob((blob) => {
       if (!blob) return;
