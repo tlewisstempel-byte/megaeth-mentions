@@ -79,31 +79,6 @@ function metricValue(result) {
   return result?.totals?.viewCount > 0 ? result.totals.viewCount : result?.totals?.visibleEngagement || 0;
 }
 
-function emptyResult(handle = "megaeth") {
-  return {
-    handle,
-    profile: {
-      handle,
-      name: "MegaETH Enjoyer",
-      avatarUrl: `https://unavatar.io/twitter/${handle}`,
-      verified: false,
-    },
-    mentionCount: 0,
-    label: "Still early",
-    totals: {
-      likeCount: 0,
-      repostCount: 0,
-      replyCount: 0,
-      quoteCount: 0,
-      viewCount: 0,
-      visibleEngagement: 0,
-    },
-    firstMention: null,
-    latestMention: null,
-    topTweets: [],
-  };
-}
-
 function cardSvg(result) {
   const safeName = escapeHtml(result.profile?.name || result.handle);
   const safeHandle = escapeHtml(result.handle);
@@ -169,6 +144,20 @@ function renderCard(result) {
   cardMount.innerHTML = cardSvg(result);
 }
 
+function renderLoadingCard(handle) {
+  cardMount.innerHTML = `
+    <div class="loading-card">
+      <p class="eyebrow">Scanning @${escapeHtml(handle)}</p>
+      <div class="loading-dots" aria-label="Loading">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <p>Checking public posts from the last 12 months.</p>
+    </div>
+  `;
+}
+
 function renderTopPost(result) {
   const tweet = result.topTweets?.[0];
   topPost.hidden = !tweet;
@@ -208,7 +197,7 @@ function applyResult(result) {
 async function scan(handle) {
   showResultView();
   currentResult = null;
-  renderCard(emptyResult(handle));
+  renderLoadingCard(handle);
   renderTopPost({ topTweets: [] });
   resultControls.hidden = true;
   resultEyebrow.textContent = "Scanning";
@@ -260,7 +249,7 @@ form.addEventListener("submit", (event) => {
 
 shareButton.addEventListener("click", () => {
   if (!currentResult) return;
-  const url = `${window.location.origin}/result/${currentResult.handle}`;
+  const url = "https://megaeth-mentions.vercel.app";
   const text =
     currentResult.mentionCount > 0
       ? `I mentioned MegaETH ${currentResult.mentionCount} times in the last 12 months.\n\nReal-time posting, apparently.\n\nCheck yours: ${url}`
