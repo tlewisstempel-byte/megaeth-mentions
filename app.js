@@ -12,9 +12,6 @@ const resultControls = document.querySelector("#resultControls");
 const qrtButton = document.querySelector("#qrtButton");
 const shareButton = document.querySelector("#shareButton");
 const downloadButton = document.querySelector("#downloadButton");
-const topPost = document.querySelector("#topPost");
-const topPostText = document.querySelector("#topPostText");
-const topPostStats = document.querySelector("#topPostStats");
 
 const STORAGE_KEY = "megaeth-mentions:last-result";
 const SITE_URL = "https://www.megamentions.xyz";
@@ -24,7 +21,6 @@ let currentResult = null;
 function showLandingView() {
   landingView.classList.add("is-active");
   resultView.classList.remove("is-active");
-  topPost.hidden = true;
 }
 
 function showResultView() {
@@ -204,27 +200,11 @@ function renderLoadingCard(handle) {
   `;
 }
 
-function renderTopPost(result) {
-  const tweet = result.topTweets?.[0];
-  topPost.hidden = !tweet;
-  if (!tweet) {
-    topPost.removeAttribute("href");
-    topPostText.textContent = "";
-    topPostStats.textContent = "";
-    return;
-  }
-
-  topPost.href = tweet.url;
-  topPostText.textContent = tweet.text;
-  topPostStats.textContent = `${compactNumber(tweet.likeCount)} likes / ${compactNumber(tweet.repostCount)} reposts / ${compactNumber(tweet.replyCount)} replies / ${compactNumber(tweet.viewCount)} views`;
-}
-
 function applyResult(result) {
   currentResult = result;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
   showResultView();
   renderCard(result);
-  renderTopPost(result);
 
   const count = compactNumber(result.mentionCount);
   const noun = result.mentionCount === 1 ? "mention" : "mentions";
@@ -245,7 +225,6 @@ async function scan(handle) {
   showResultView();
   currentResult = null;
   renderLoadingCard(handle);
-  renderTopPost({ topTweets: [] });
   resultControls.hidden = true;
   resultEyebrow.textContent = "Scanning";
   resultTitle.textContent = `Scanning @${handle}`;

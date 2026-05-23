@@ -265,7 +265,6 @@ module.exports = async function handler(request, response) {
       totals,
       firstMention: oldest,
       latestMention: latest,
-      topTweets,
       searchedTerms: ["megaeth", "mega eth", "@megaeth_labs", "@megaeth", "#megaeth"],
     });
   } catch (error) {
