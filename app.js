@@ -9,13 +9,11 @@ const resultEyebrow = document.querySelector("#resultEyebrow");
 const resultTitle = document.querySelector("#resultTitle");
 const resultCopy = document.querySelector("#resultCopy");
 const resultControls = document.querySelector("#resultControls");
-const qrtButton = document.querySelector("#qrtButton");
 const shareButton = document.querySelector("#shareButton");
 const downloadButton = document.querySelector("#downloadButton");
 
 const STORAGE_KEY = "megaeth-mentions:last-result";
 const SITE_URL = "https://www.megamentions.xyz";
-const ORIGINAL_POST_URL = "https://x.com/CAPTA1NSCARLET/status/2058128138278723844?s=20";
 let currentResult = null;
 
 function showLandingView() {
@@ -215,8 +213,6 @@ function applyResult(result) {
       ? `@${result.handle} has been posting in real time.`
       : `@${result.handle} has not mentioned MegaETH in the last 12 months.`;
   resultControls.hidden = false;
-  qrtButton.disabled = !ORIGINAL_POST_URL;
-  qrtButton.title = ORIGINAL_POST_URL ? "" : "Add the launch tweet URL in app.js after posting.";
   shareButton.disabled = false;
   downloadButton.disabled = false;
 }
@@ -285,12 +281,6 @@ function resultShareText(result) {
 
   return `Apparently I have mentioned MegaETH 0 times in the last 12 months.\n\n${result.label}.\n\nCheck yours: ${SITE_URL}`;
 }
-
-qrtButton.addEventListener("click", () => {
-  if (!currentResult) return;
-  if (!ORIGINAL_POST_URL) return;
-  window.open(ORIGINAL_POST_URL, "_blank", "noopener,noreferrer");
-});
 
 shareButton.addEventListener("click", () => {
   if (!currentResult) return;
