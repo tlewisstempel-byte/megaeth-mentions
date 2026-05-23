@@ -18,7 +18,7 @@ const topPostStats = document.querySelector("#topPostStats");
 
 const STORAGE_KEY = "megaeth-mentions:last-result";
 const SITE_URL = "https://www.megamentions.xyz";
-const ORIGINAL_POST_URL = "";
+const ORIGINAL_POST_URL = "https://x.com/CAPTA1NSCARLET/status/2058128138278723844?s=20";
 let currentResult = null;
 
 function showLandingView() {
