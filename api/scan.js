@@ -204,7 +204,9 @@ module.exports = async function handler(request, response) {
     const tweets = [...tweetsById.values()].sort((a, b) => b.timestamp - a.timestamp);
     const oldest = tweets.length ? tweets[tweets.length - 1] : null;
     const latest = tweets.length ? tweets[0] : null;
-    const topTweets = [...tweets].sort((a, b) => b.engagement + b.viewCount / 1000 - (a.engagement + a.viewCount / 1000)).slice(0, 5);
+    const topTweets = [...tweets]
+      .sort((a, b) => b.viewCount - a.viewCount || b.engagement - a.engagement)
+      .slice(0, 5);
     const totals = tweets.reduce(
       (acc, tweet) => {
         acc.likeCount += tweet.likeCount;
