@@ -146,7 +146,7 @@ function normalizeTweet(tweet, handle) {
 
 function rankLabel(count, viewCount = 0) {
   if (count > 20 && viewCount > 10000) return "mega sexy";
-  if (count > 15) return "megapilled";
+  if (count > 15 && viewCount >= 5000) return "megapilled";
   if (count > 10) return "kindamega";
   if (count >= 5) return "notmega";
   return "probably a monad fan";
