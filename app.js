@@ -112,14 +112,13 @@ function cardSvg(result) {
     ${Array.from({ length: 14 }, (_, i) => `<path d="M0 ${i * 48}h1200" stroke="#f4f5ee" stroke-width="1"/>`).join("")}
   </g>
   <text x="72" y="72" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="22" font-weight="700" letter-spacing="4">MEGAETH MENTIONS</text>
-  <text x="1098" y="72" text-anchor="end" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="900">M</text>
 
   <circle cx="164" cy="164" r="74" fill="none" stroke="#b7ff2a" stroke-width="3"/>
   <image href="${avatar}" x="94" y="94" width="140" height="140" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)"/>
   <text x="270" y="145" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="900">${safeName}</text>
   <text x="270" y="190" fill="rgba(244,245,238,.62)" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">@${safeHandle}</text>
-  <text x="270" y="230" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="15" font-weight="700" letter-spacing="3">${label.toUpperCase()}</text>
 
+  <text x="78" y="304" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="24" font-weight="700" letter-spacing="6">${label.toUpperCase()}</text>
   <text x="72" y="410" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="178" font-weight="900">${main}</text>
   <text x="78" y="459" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="23" font-weight="700" letter-spacing="7">MEGAETH MENTIONS</text>
 
