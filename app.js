@@ -81,10 +81,10 @@ function metricValue(result) {
   return result?.totals?.viewCount > 0 ? result.totals.viewCount : result?.totals?.visibleEngagement || 0;
 }
 
-function cardSvg(result) {
+function cardSvg(result, avatarOverride = "") {
   const safeName = escapeHtml(result.profile?.name || result.handle);
   const safeHandle = escapeHtml(result.handle);
-  const avatar = escapeHtml(avatarUrl(result));
+  const avatar = escapeHtml(avatarOverride || avatarUrl(result));
   const main = compactNumber(result.mentionCount);
   const secondary = compactNumber(metricValue(result));
   const label = escapeHtml(result.label || "MegaETH poster");
@@ -142,6 +142,21 @@ function cardSvg(result) {
 
 function renderCard(result) {
   cardMount.innerHTML = cardSvg(result);
+}
+
+async function avatarDataUrl(result) {
+  try {
+    const response = await fetch("/api/avatar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: avatarUrl(result) }),
+    });
+    if (!response.ok) return "";
+    const data = await response.json();
+    return data.dataUrl || "";
+  } catch {
+    return "";
+  }
 }
 
 function renderLoadingCard(handle) {
@@ -277,9 +292,11 @@ shareButton.addEventListener("click", () => {
   );
 });
 
-downloadButton.addEventListener("click", () => {
+downloadButton.addEventListener("click", async () => {
   if (!currentResult) return;
-  const svgBlob = new Blob([cardSvg(currentResult)], { type: "image/svg+xml;charset=utf-8" });
+  downloadButton.disabled = true;
+  const inlineAvatar = await avatarDataUrl(currentResult);
+  const svgBlob = new Blob([cardSvg(currentResult, inlineAvatar)], { type: "image/svg+xml;charset=utf-8" });
   const svgUrl = URL.createObjectURL(svgBlob);
   const image = new Image();
   image.decoding = "async";
@@ -301,10 +318,12 @@ downloadButton.addEventListener("click", () => {
       link.click();
       link.remove();
       URL.revokeObjectURL(pngUrl);
+      downloadButton.disabled = false;
     }, "image/png");
   };
   image.onerror = () => {
     URL.revokeObjectURL(svgUrl);
+    downloadButton.disabled = false;
     setStatus("Could not download the image. Try again.", "error");
   };
   image.src = svgUrl;
