@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#050604" />
+  <meta name="description" content="Check how many times an X account mentioned MegaETH in the last 12 months." />
+  <title>MegaETH Mentions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar" aria-label="Site header">
+      <a class="brand" href="/" aria-label="MegaETH Mentions">
+        <span class="brand-mark">M</span>
+        <span>MEGAETH MENTIONS</span>
+      </a>
+      <p class="topline">Public posts only</p>
+    </header>
+
+    <section class="hero" id="checker">
+      <div class="hero-copy">
+        <p class="eyebrow">Real-time social receipt</p>
+        <h1>How many times did you mention MegaETH this year?</h1>
+      </div>
+
+      <form class="scan-panel" id="scanForm">
+        <label for="handleInput">X handle</label>
+        <div class="input-row">
+          <span>@</span>
+          <input id="handleInput" name="handle" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="vitalikbuterin" />
+          <button id="scanButton" type="submit">Check</button>
+        </div>
+        <p id="status" class="status">No wallet. No X login. Public posts only.</p>
+      </form>
+    </section>
+
+    <section class="stage" id="stage" aria-live="polite">
+      <div class="result-card-wrap" id="cardMount"></div>
+
+      <div class="result-side">
+        <div class="result-summary">
+          <p class="eyebrow">Result</p>
+          <h2 id="resultTitle">Enter a handle to start.</h2>
+          <p id="resultCopy">The card will appear here once the scan is complete.</p>
+        </div>
+
+        <div class="actions">
+          <button id="shareButton" type="button" disabled>Share to X</button>
+          <button id="downloadButton" type="button" class="secondary" disabled>Download card</button>
+          <button id="copyButton" type="button" class="secondary" disabled>Copy link</button>
+        </div>
+
+        <div class="meta-grid" id="metaGrid" hidden>
+          <div>
+            <span id="metaFirst">-</span>
+            <p>First mention</p>
+          </div>
+          <div>
+            <span id="metaLatest">-</span>
+            <p>Latest mention</p>
+          </div>
+          <div>
+            <span id="metaViews">-</span>
+            <p id="metaViewsLabel">Views</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="posts" id="postsSection" hidden>
+      <div class="section-head">
+        <p class="eyebrow">Top posts</p>
+        <h2>Most visible MegaETH mentions</h2>
+      </div>
+      <div id="postList" class="post-list"></div>
+    </section>
+
+    <footer class="footer">
+      <p>Unofficial community tool. Not affiliated with MegaETH. No wallet connection. No rewards. No token claim.</p>
+    </footer>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
