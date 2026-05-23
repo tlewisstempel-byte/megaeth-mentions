@@ -122,9 +122,9 @@ function cardSvg(result, avatarOverride = "") {
   <text x="78" y="459" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="23" font-weight="700" letter-spacing="7">MEGAETH MENTIONS</text>
 
   <path d="M672 118v354" stroke="rgba(244,245,238,.16)" stroke-width="1"/>
-  <text x="754" y="190" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="24" font-weight="700" letter-spacing="6">${label.toUpperCase()}</text>
-  <text x="748" y="295" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="120" font-weight="900">${secondary}</text>
-  <text x="754" y="344" fill="rgba(244,245,238,.68)" font-family="Space Mono, monospace" font-size="20" font-weight="700" letter-spacing="7">${metric}</text>
+  <text x="754" y="172" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="24" font-weight="700" letter-spacing="6">${label.toUpperCase()}</text>
+  <text x="748" y="302" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="120" font-weight="900">${secondary}</text>
+  <text x="754" y="351" fill="rgba(244,245,238,.68)" font-family="Space Mono, monospace" font-size="20" font-weight="700" letter-spacing="7">${metric}</text>
 
   <rect x="72" y="500" width="1056" height="78" fill="rgba(244,245,238,.035)" stroke="rgba(244,245,238,.16)"/>
   <text x="126" y="534" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="900">${likes}</text>
