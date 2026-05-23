@@ -136,7 +136,6 @@ function cardSvg(result) {
   <text x="790" y="560" fill="rgba(244,245,238,.58)" font-family="Space Mono, monospace" font-size="12" font-weight="700" letter-spacing="2">FIRST</text>
   <text x="980" y="534" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900">${latest}</text>
   <text x="980" y="560" fill="rgba(244,245,238,.58)" font-family="Space Mono, monospace" font-size="12" font-weight="700" letter-spacing="2">LATEST</text>
-  <text x="600" y="604" text-anchor="middle" fill="rgba(244,245,238,.42)" font-family="Space Mono, monospace" font-size="13" font-weight="700" letter-spacing="5">MEGAMENTION.XYZ</text>
 </svg>`.trim();
 }
 
