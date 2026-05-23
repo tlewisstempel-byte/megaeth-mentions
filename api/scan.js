@@ -4,6 +4,9 @@ const path = require("path");
 
 const STRONG_QUERY = '(megaeth OR "mega eth" OR @megaeth_labs OR @megaeth OR "#megaeth")';
 const MAX_WINDOWS = 18;
+const MAX_SEARCH_REQUESTS = 90;
+const WINDOW_RESULT_CAP = 18;
+const MIN_WINDOW_SECONDS = 6 * 60 * 60;
 
 function send(response, status, body) {
   response.setHeader("Access-Control-Allow-Origin", "*");
@@ -106,6 +109,10 @@ function unwrapTweets(payload) {
   return [];
 }
 
+function hasMoreResults(payload) {
+  return Boolean(payload?.has_next_page || payload?.hasNextPage || payload?.has_more || payload?.hasMore);
+}
+
 function normalizeTweet(tweet, handle) {
   const author = tweet.author || {};
   const id = String(tweet.id || tweet.tweetId || tweet.rest_id || "");
@@ -145,6 +152,33 @@ function rankLabel(count) {
   return "probably a monad fan";
 }
 
+async function searchWindow(handle, window, token, state) {
+  state.searchRequests += 1;
+  const payload = await apiGet(
+    "/twitter/tweet/advanced_search",
+    {
+      query: `from:${handle} ${STRONG_QUERY} -filter:retweets since_time:${window.start} until_time:${window.end}`,
+      queryType: "Latest",
+    },
+    token
+  );
+
+  const tweets = unwrapTweets(payload);
+  const duration = window.end - window.start;
+  const mightBeCapped = tweets.length >= WINDOW_RESULT_CAP || hasMoreResults(payload);
+
+  if (mightBeCapped && duration > MIN_WINDOW_SECONDS && state.searchRequests < MAX_SEARCH_REQUESTS) {
+    const midpoint = Math.floor(window.start + duration / 2);
+    const [older, newer] = await Promise.all([
+      searchWindow(handle, { start: window.start, end: midpoint }, token, state),
+      searchWindow(handle, { start: midpoint, end: window.end }, token, state),
+    ]);
+    return [...older, ...newer];
+  }
+
+  return tweets;
+}
+
 module.exports = async function handler(request, response) {
   if (request.method === "OPTIONS") {
     response.status(204).end();
@@ -177,23 +211,15 @@ module.exports = async function handler(request, response) {
   }
 
   try {
-    const [profilePayload, ...searchPayloads] = await Promise.all([
+    const searchState = { searchRequests: 0 };
+    const [profilePayload, searchResults] = await Promise.all([
       apiGet("/twitter/user/info", { userName: handle }, token),
-      ...monthWindows().map((window) =>
-        apiGet(
-          "/twitter/tweet/advanced_search",
-          {
-            query: `from:${handle} ${STRONG_QUERY} -filter:retweets since_time:${window.start} until_time:${window.end}`,
-            queryType: "Latest",
-          },
-          token
-        )
-      ),
+      Promise.all(monthWindows().map((window) => searchWindow(handle, window, token, searchState))),
     ]);
 
     const tweetsById = new Map();
-    for (const payload of searchPayloads) {
-      for (const raw of unwrapTweets(payload)) {
+    for (const results of searchResults) {
+      for (const raw of results) {
         const tweet = normalizeTweet(raw, handle);
         if (!tweet.id || !confirmedMegaEthMention(tweet.text)) continue;
         tweetsById.set(tweet.id, tweet);
