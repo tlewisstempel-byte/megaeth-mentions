@@ -1,10 +1,14 @@
 const form = document.querySelector("#scanForm");
+const landingView = document.querySelector("#landingView");
+const resultView = document.querySelector("#resultView");
 const handleInput = document.querySelector("#handleInput");
 const scanButton = document.querySelector("#scanButton");
 const statusEl = document.querySelector("#status");
 const cardMount = document.querySelector("#cardMount");
+const resultEyebrow = document.querySelector("#resultEyebrow");
 const resultTitle = document.querySelector("#resultTitle");
 const resultCopy = document.querySelector("#resultCopy");
+const resultControls = document.querySelector("#resultControls");
 const shareButton = document.querySelector("#shareButton");
 const downloadButton = document.querySelector("#downloadButton");
 const copyButton = document.querySelector("#copyButton");
@@ -18,6 +22,19 @@ const postList = document.querySelector("#postList");
 
 const STORAGE_KEY = "megaeth-mentions:last-result";
 let currentResult = null;
+
+function showLandingView() {
+  landingView.classList.add("is-active");
+  resultView.classList.remove("is-active");
+  postsSection.classList.remove("is-active");
+  postsSection.hidden = true;
+}
+
+function showResultView() {
+  landingView.classList.remove("is-active");
+  resultView.classList.add("is-active");
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
 
 function cleanHandle(value) {
   return String(value || "")
@@ -160,6 +177,7 @@ function renderCard(result) {
 function renderPosts(result) {
   const tweets = result.topTweets || [];
   postsSection.hidden = tweets.length === 0;
+  postsSection.classList.toggle("is-active", tweets.length > 0);
   postList.innerHTML = tweets
     .map(
       (tweet, index) => `
@@ -178,11 +196,13 @@ function renderPosts(result) {
 function applyResult(result) {
   currentResult = result;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+  showResultView();
   renderCard(result);
   renderPosts(result);
 
   const count = compactNumber(result.mentionCount);
   const noun = result.mentionCount === 1 ? "mention" : "mentions";
+  resultEyebrow.textContent = "Result";
   resultTitle.textContent = `${count} MegaETH ${noun}`;
   resultCopy.textContent =
     result.mentionCount > 0
@@ -193,12 +213,22 @@ function applyResult(result) {
   metaViews.textContent = compactNumber(metricValue(result));
   metaViewsLabel.textContent = metricLabel(result).toLowerCase();
   metaGrid.hidden = false;
+  resultControls.hidden = false;
   shareButton.disabled = false;
   downloadButton.disabled = false;
   copyButton.disabled = false;
 }
 
 async function scan(handle) {
+  showResultView();
+  currentResult = null;
+  renderCard(emptyResult(handle));
+  renderPosts({ topTweets: [] });
+  resultControls.hidden = true;
+  metaGrid.hidden = true;
+  resultEyebrow.textContent = "Scanning";
+  resultTitle.textContent = `Scanning @${handle}`;
+  resultCopy.textContent = "Finding confirmed MegaETH mentions from the last 12 months.";
   setStatus("Scanning public posts");
   scanButton.disabled = true;
   scanButton.textContent = "Scanning";
@@ -206,6 +236,7 @@ async function scan(handle) {
   try {
     await new Promise((resolve) => setTimeout(resolve, 220));
     setStatus("Counting confirmed MegaETH mentions");
+    resultCopy.textContent = "Counting confirmed MegaETH mentions.";
     const response = await fetch("/api/scan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -215,11 +246,16 @@ async function scan(handle) {
     const data = text ? JSON.parse(text) : {};
     if (!response.ok) throw new Error(data.error || response.statusText);
     setStatus("Building your card");
+    resultCopy.textContent = "Building your card.";
     applyResult(data);
     setStatus(`Scan complete. ${data.mentionCount} confirmed MegaETH mentions found.`);
     history.replaceState(null, "", `/result/${data.handle}`);
   } catch (error) {
-    setStatus(error instanceof Error ? error.message : "Scan failed.", "error");
+    const message = error instanceof Error ? error.message : "Scan failed.";
+    setStatus(message, "error");
+    resultEyebrow.textContent = "Error";
+    resultTitle.textContent = "Scan did not complete.";
+    resultCopy.textContent = message;
   } finally {
     scanButton.disabled = false;
     scanButton.textContent = "Check";
@@ -273,7 +309,7 @@ function boot() {
   if (stored) {
     try {
       const result = JSON.parse(stored);
-      if (!routeHandle || routeHandle.toLowerCase() === result.handle?.toLowerCase()) {
+      if (routeHandle && routeHandle.toLowerCase() === result.handle?.toLowerCase()) {
         handleInput.value = result.handle || "";
         applyResult(result);
         return;
@@ -282,10 +318,11 @@ function boot() {
       localStorage.removeItem(STORAGE_KEY);
     }
   }
-  renderCard(emptyResult(routeHandle || "megaeth"));
   if (routeHandle) {
     handleInput.value = routeHandle;
     scan(routeHandle);
+  } else {
+    showLandingView();
   }
 }
 

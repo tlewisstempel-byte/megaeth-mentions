@@ -82,7 +82,15 @@ a {
 .shell {
   width: min(1180px, calc(100vw - 36px));
   margin: 0 auto;
-  padding: 24px 0 52px;
+  padding: 24px 0 36px;
+}
+
+.view {
+  display: none;
+}
+
+.view.is-active {
+  display: block;
 }
 
 .topbar {
@@ -142,9 +150,9 @@ a {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 0.56fr);
   gap: 64px;
-  align-items: end;
-  min-height: 520px;
-  padding: 72px 0 62px;
+  align-items: center;
+  min-height: calc(100vh - 116px);
+  padding: clamp(52px, 9vh, 92px) 0;
 }
 
 .eyebrow {
@@ -163,16 +171,17 @@ p {
 h1 {
   max-width: 780px;
   margin-bottom: 0;
-  font-size: clamp(62px, 8.5vw, 126px);
+  font-size: clamp(58px, 7.1vw, 112px);
   font-weight: 900;
   letter-spacing: 0;
-  line-height: 0.86;
+  line-height: 0.88;
 }
 
 .scan-panel {
+  align-self: center;
   border: 1px solid var(--line-strong);
   background: rgba(5, 6, 4, 0.72);
-  padding: 22px;
+  padding: 28px;
 }
 
 .scan-panel label {
@@ -232,16 +241,36 @@ h1 {
   color: var(--danger);
 }
 
-.stage {
+.result-view {
+  padding: clamp(42px, 7vh, 76px) 0 44px;
+}
+
+.result-view.is-active {
+  display: block;
+}
+
+.result-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 28px;
-  align-items: stretch;
-  padding: 8px 0 56px;
+  align-items: start;
+  margin-bottom: 28px;
+}
+
+.back-link {
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+  font-family: "Space Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 13px 15px;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 .result-card-wrap {
-  min-height: 410px;
+  min-height: 0;
   border: 1px solid var(--line);
   background: rgba(7, 8, 6, 0.64);
   display: grid;
@@ -255,35 +284,46 @@ h1 {
   height: auto;
 }
 
-.result-side {
-  border-left: 1px solid var(--line);
-  padding-left: 28px;
-}
-
 .result-summary h2,
 .section-head h2 {
   margin: 0 0 14px;
-  font-size: 32px;
+  max-width: 760px;
+  font-size: clamp(36px, 5vw, 72px);
   line-height: 1;
   letter-spacing: 0;
 }
 
 .result-summary p:not(.eyebrow) {
   color: var(--muted);
-  font-size: 16px;
+  max-width: 640px;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .actions {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 10px;
-  margin: 26px 0;
+  margin: 0;
+}
+
+.result-controls {
+  border: 1px solid var(--line);
+  border-top: 0;
+  padding: 18px;
+  background: rgba(5, 6, 4, 0.48);
+}
+
+.result-controls button {
+  min-width: 180px;
 }
 
 .meta-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+  margin-top: 14px;
 }
 
 .meta-grid div {
@@ -307,7 +347,11 @@ h1 {
 
 .posts {
   border-top: 1px solid var(--line);
-  padding-top: 46px;
+  padding-top: 38px;
+}
+
+.posts.is-active {
+  display: block;
 }
 
 .section-head {
@@ -377,19 +421,14 @@ h1 {
 
 @media (max-width: 900px) {
   .hero,
-  .stage {
+  .result-header {
     grid-template-columns: 1fr;
   }
 
   .hero {
-    min-height: auto;
+    min-height: calc(100vh - 100px);
     gap: 34px;
     padding: 58px 0 38px;
-  }
-
-  .result-side {
-    border-left: 0;
-    padding-left: 0;
   }
 
   .meta-grid {
@@ -428,7 +467,7 @@ h1 {
     border-width: 1px 0 0;
   }
 
-  .stage {
+  .result-view {
     padding-bottom: 40px;
   }
 

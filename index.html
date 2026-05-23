@@ -21,7 +21,8 @@
       <p class="topline">Public posts only</p>
     </header>
 
-    <section class="hero" id="checker">
+    <section class="view hero-view is-active" id="landingView">
+      <div class="hero" id="checker">
       <div class="hero-copy">
         <p class="eyebrow">Real-time social receipt</p>
         <h1>How many times did you mention MegaETH this year?</h1>
@@ -36,42 +37,46 @@
         </div>
         <p id="status" class="status">No wallet. No X login. Public posts only.</p>
       </form>
+      </div>
     </section>
 
-    <section class="stage" id="stage" aria-live="polite">
-      <div class="result-card-wrap" id="cardMount"></div>
-
-      <div class="result-side">
+    <section class="view result-view" id="resultView" aria-live="polite">
+      <div class="result-header">
         <div class="result-summary">
-          <p class="eyebrow">Result</p>
+          <p class="eyebrow" id="resultEyebrow">Scanning</p>
           <h2 id="resultTitle">Enter a handle to start.</h2>
           <p id="resultCopy">The card will appear here once the scan is complete.</p>
         </div>
+        <a class="back-link" href="/" id="backLink">Run another</a>
+      </div>
 
+      <div class="result-card-wrap" id="cardMount"></div>
+
+      <div class="result-controls" id="resultControls" hidden>
         <div class="actions">
           <button id="shareButton" type="button" disabled>Share to X</button>
           <button id="downloadButton" type="button" class="secondary" disabled>Download card</button>
           <button id="copyButton" type="button" class="secondary" disabled>Copy link</button>
         </div>
+      </div>
 
-        <div class="meta-grid" id="metaGrid" hidden>
-          <div>
-            <span id="metaFirst">-</span>
-            <p>First mention</p>
-          </div>
-          <div>
-            <span id="metaLatest">-</span>
-            <p>Latest mention</p>
-          </div>
-          <div>
-            <span id="metaViews">-</span>
-            <p id="metaViewsLabel">Views</p>
-          </div>
+      <div class="meta-grid" id="metaGrid" hidden>
+        <div>
+          <span id="metaFirst">-</span>
+          <p>First mention</p>
+        </div>
+        <div>
+          <span id="metaLatest">-</span>
+          <p>Latest mention</p>
+        </div>
+        <div>
+          <span id="metaViews">-</span>
+          <p id="metaViewsLabel">Views</p>
         </div>
       </div>
     </section>
 
-    <section class="posts" id="postsSection" hidden>
+    <section class="view posts" id="postsSection" hidden>
       <div class="section-head">
         <p class="eyebrow">Top posts</p>
         <h2>Most visible MegaETH mentions</h2>
