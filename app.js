@@ -12,13 +12,9 @@ const resultControls = document.querySelector("#resultControls");
 const shareButton = document.querySelector("#shareButton");
 const downloadButton = document.querySelector("#downloadButton");
 const copyButton = document.querySelector("#copyButton");
-const metaGrid = document.querySelector("#metaGrid");
-const metaFirst = document.querySelector("#metaFirst");
-const metaLatest = document.querySelector("#metaLatest");
-const metaViews = document.querySelector("#metaViews");
-const metaViewsLabel = document.querySelector("#metaViewsLabel");
-const postsSection = document.querySelector("#postsSection");
-const postList = document.querySelector("#postList");
+const topPost = document.querySelector("#topPost");
+const topPostText = document.querySelector("#topPostText");
+const topPostStats = document.querySelector("#topPostStats");
 
 const STORAGE_KEY = "megaeth-mentions:last-result";
 let currentResult = null;
@@ -26,8 +22,7 @@ let currentResult = null;
 function showLandingView() {
   landingView.classList.add("is-active");
   resultView.classList.remove("is-active");
-  postsSection.classList.remove("is-active");
-  postsSection.hidden = true;
+  topPost.hidden = true;
 }
 
 function showResultView() {
@@ -174,23 +169,19 @@ function renderCard(result) {
   cardMount.innerHTML = cardSvg(result);
 }
 
-function renderPosts(result) {
-  const tweets = result.topTweets || [];
-  postsSection.hidden = tweets.length === 0;
-  postsSection.classList.toggle("is-active", tweets.length > 0);
-  postList.innerHTML = tweets
-    .map(
-      (tweet, index) => `
-      <a class="tweet" href="${escapeHtml(tweet.url)}" target="_blank" rel="noreferrer">
-        <span class="tweet-index">${index + 1}</span>
-        <div>
-          <p class="tweet-text">${escapeHtml(tweet.text)}</p>
-          <span class="tweet-stats">${compactNumber(tweet.likeCount)} likes / ${compactNumber(tweet.repostCount)} reposts / ${compactNumber(tweet.replyCount)} replies / ${compactNumber(tweet.viewCount)} views</span>
-        </div>
-        <span class="tweet-date">${formatDate(tweet.createdAt)}</span>
-      </a>`
-    )
-    .join("");
+function renderTopPost(result) {
+  const tweet = result.topTweets?.[0];
+  topPost.hidden = !tweet;
+  if (!tweet) {
+    topPost.removeAttribute("href");
+    topPostText.textContent = "";
+    topPostStats.textContent = "";
+    return;
+  }
+
+  topPost.href = tweet.url;
+  topPostText.textContent = tweet.text;
+  topPostStats.textContent = `${compactNumber(tweet.likeCount)} likes / ${compactNumber(tweet.repostCount)} reposts / ${compactNumber(tweet.replyCount)} replies / ${compactNumber(tweet.viewCount)} views`;
 }
 
 function applyResult(result) {
@@ -198,7 +189,7 @@ function applyResult(result) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
   showResultView();
   renderCard(result);
-  renderPosts(result);
+  renderTopPost(result);
 
   const count = compactNumber(result.mentionCount);
   const noun = result.mentionCount === 1 ? "mention" : "mentions";
@@ -208,11 +199,6 @@ function applyResult(result) {
     result.mentionCount > 0
       ? `@${result.handle} has been posting in real time.`
       : `@${result.handle} has not mentioned MegaETH in the last 12 months.`;
-  metaFirst.textContent = formatDate(result.firstMention?.createdAt);
-  metaLatest.textContent = formatDate(result.latestMention?.createdAt);
-  metaViews.textContent = compactNumber(metricValue(result));
-  metaViewsLabel.textContent = metricLabel(result).toLowerCase();
-  metaGrid.hidden = false;
   resultControls.hidden = false;
   shareButton.disabled = false;
   downloadButton.disabled = false;
@@ -223,9 +209,8 @@ async function scan(handle) {
   showResultView();
   currentResult = null;
   renderCard(emptyResult(handle));
-  renderPosts({ topTweets: [] });
+  renderTopPost({ topTweets: [] });
   resultControls.hidden = true;
-  metaGrid.hidden = true;
   resultEyebrow.textContent = "Scanning";
   resultTitle.textContent = `Scanning @${handle}`;
   resultCopy.textContent = "Finding confirmed MegaETH mentions from the last 12 months.";
