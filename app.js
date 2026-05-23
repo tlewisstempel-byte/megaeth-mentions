@@ -118,11 +118,11 @@ function cardSvg(result) {
   <text x="270" y="145" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="900">${safeName}</text>
   <text x="270" y="190" fill="rgba(244,245,238,.62)" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">@${safeHandle}</text>
 
-  <text x="78" y="304" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="24" font-weight="700" letter-spacing="6">${label.toUpperCase()}</text>
   <text x="72" y="410" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="178" font-weight="900">${main}</text>
   <text x="78" y="459" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="23" font-weight="700" letter-spacing="7">MEGAETH MENTIONS</text>
 
   <path d="M672 118v354" stroke="rgba(244,245,238,.16)" stroke-width="1"/>
+  <text x="754" y="190" fill="#b7ff2a" font-family="Space Mono, monospace" font-size="24" font-weight="700" letter-spacing="6">${label.toUpperCase()}</text>
   <text x="748" y="295" fill="#f4f5ee" font-family="Inter, Arial, sans-serif" font-size="120" font-weight="900">${secondary}</text>
   <text x="754" y="344" fill="rgba(244,245,238,.68)" font-family="Space Mono, monospace" font-size="20" font-weight="700" letter-spacing="7">${metric}</text>
 
@@ -218,7 +218,12 @@ async function scan(handle) {
       body: JSON.stringify({ handle }),
     });
     const text = await response.text();
-    const data = text ? JSON.parse(text) : {};
+    let data = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      throw new Error(response.ok ? "The scan returned an unreadable response." : "The scan service is temporarily unavailable.");
+    }
     if (!response.ok) throw new Error(data.error || response.statusText);
     setStatus("Building your card");
     resultCopy.textContent = "Building your card.";

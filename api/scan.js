@@ -82,7 +82,12 @@ async function apiGet(pathname, params, token) {
   });
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : {};
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(`twitterapi.io returned a non-JSON response (${response.status}).`);
+  }
   if (!response.ok || data.status === "error") {
     throw new Error(data.msg || data.message || text || response.statusText);
   }
